@@ -414,95 +414,78 @@ body.modo-nocturno .btn-modo.active {
 .tarjetas {
   display: flex;
   justify-content: center;
+  align-items: flex-start;
   flex-wrap: wrap;
-  gap: 30px;
+  gap: 20px; /* separación entre tarjetas */
   padding: 40px;
+  margin: 0 auto; 
 }
 
-.tarjeta {
+.accordion-item {
   width: 300px;
-  background: var(--bg);
+  background: white;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   transition: transform 0.3s ease;
 }
 
-/* Efecto de movimiento en tarjeta, para que se quede mas visual y llamativo*/
-.tarjeta:hover {
+.accordion-item:hover {
   transform: translateY(-5px);
 }
 
-.tarjeta img {
+.accordion-item img {
   width: 100%;
   height: 200px;
+  object-fit: cover;
 }
 
-/* Título de cada tarjeta */
-.tarjeta h3 {
-  text-align: center;
-  margin: 1rem 0;
-  font-size: 1.2rem;
-  color: var(--text);
-}
-
-/* Boton desplegable */
-
-.despegable-btn {
-  display: block;
+/* Botón / header */
+.accordion-header {
   width: 100%;
   padding: 0.6rem;
-  background: var(--accent);
+  background: #d4b89b;
   border: none;
-  border-radius: 0 0 10px 10px;
   cursor: pointer;
-  font-size: 0.9rem;
-  color: var(--text);
+  font-size: 1rem;
   font-weight: bold;
-  transition: 0.3s ease;
+  color: #333;
+  transition: background 0.3s ease;
 }
 
-.despegable-btn:hover {
+.accordion-header:hover {
   background: #c8a480;
 }
 
-/* Contenedor de curiosidades "oculto" por defecto para generar despegable con JS */
-
-.curiosidades {
+/* Contenido oculto */
+.accordion-content {
   max-height: 0;
   overflow: hidden;
-  background: var(--bg);
+  background: #f9f5f0;
   padding: 0 1rem;
-  transition:  max-height 0.4s ease, padding 0.3s ease;
+  transition: max-height 0.3s ease;
 }
 
-.curiosidades ul {
+/* Contenido visible */
+.accordion-content.show {
+  max-height: 1000px;
+}
+
+/* Lista */
+.accordion-content ul {
   list-style: none;
   padding: 1rem 0;
   margin: 0;
 }
-.curiosidades li::before {
-  content: "📌";
-}
 
-.curiosidades li {
+.accordion-content li {
   margin: 0.5rem 0;
   line-height: 1.4;
-  color: var(--text);
+  color: #555;
 }
 
-/* Para estado desplegado, visible para cliente */
 
-.tarjeta.expanded .curiosidades {
-  max-height: 1000px; /* para adaptarse a la cantidad de texto escrito */
-}
-
-.tarjeta.expanded .despegable-btn {
-  background: #c8a480;
-  color: white;
-}
-
-/*Estilos para la tabla de cuidados*/
+/*Estilos para la tabla de seccion de cuidados*/
 
 .titulo-tabla {
   width: 100%;

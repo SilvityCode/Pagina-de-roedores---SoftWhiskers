@@ -24,37 +24,14 @@ btnDiurno.classList.remove('active')
 
 /* Boton desplegable en contenedores tarjeta */
 
-// Seleccionamos todos los botones
-const botones = document.querySelectorAll(".despegable-btn");
+// Seleccionamos todos los encabezados de las tarjetas
+const accordionHeaders = document.querySelectorAll('.accordion-header');
 
-// Variable para saber si están abiertas o cerradas
-let abiertas = false; /*por defecto cerradas*/ 
-
-botones.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    const curiosidades = document.querySelectorAll(".curiosidades");
-
-    if (!abiertas) {
-      // Mostrar todas las tarjetas
-      curiosidades.forEach((curiosidad) => {
-        curiosidad.style.maxHeight = "1000px";
-        curiosidad.style.padding = "1rem";
-      });
-
-      // Cambiar texto de los botones
-      botones.forEach((b) => (b.textContent = "Ocultar curiosidades"));
-      abiertas = true;
-    } else {
-      // Ocultar todas
-      curiosidades.forEach((curiosidad) => {
-        curiosidad.style.maxHeight = "0";
-        curiosidad.style.padding = "0 1rem";
-      });
-
-      // Volver a texto original
-      botones.forEach((b) => (b.textContent = "Ver curiosidades"));
-      abiertas = false;
-    }
+//Quiero que varias tarjetas puedan estar abiertas al mismo tiempo
+accordionHeaders.forEach(header => {
+  header.addEventListener('click', () => {
+    const content = header.nextElementSibling; 
+    content.classList.toggle('show');
   });
 });
 
