@@ -488,27 +488,31 @@ body.modo-nocturno .btn-modo.active {
 /*Estilos para la tabla de seccion de cuidados*/
 
 .titulo-tabla {
-  width: 100%;
+  font-size: 1.2rem;
   text-align: center;
-  font-size: 1.5rem;
-  color: #313a0463;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
+}
+
+.tabla-contenedor {
+  overflow-x: auto;
+  padding: 0.5rem;
+  margin: 1rem 0;
 }
 
 table {
-  max-width:100%; 
-  border: 1px solid #0b0b0b;
-  border-collapse: collapse; 
-  margin: 1rem;
-  background: var(--bg);
+  width: 100%;
   border-collapse: collapse;
+  background: var(--bg);
+  border: 1px solid #0b0b0b;
+  min-width: 600px; /* obliga a que tenga un ancho mínimo, pero se puede desplazar */
 }
 
 th,
 td {
-  border: 1px solid #0b0b0b; 
-  padding: 0.5rem; 
+  border: 1px solid #0b0b0b;
+  padding: 0.5rem;
   text-align: center;
+  font-size: 0.85rem; /* reduce el tamaño en móvil */
 }
 
 thead th:hover {
@@ -525,6 +529,20 @@ tbody tr:hover {
 
 tfoot tr:hover {
   background: var(--accent);
+}
+
+/* En móvil, reduce el padding y ajusta el texto */
+@media (max-width: 768px) {
+  th,
+  td {
+    padding: 0.3rem;
+    font-size: 0.75rem;
+    word-wrap: break-word; /* rompe palabras largas */
+  }
+
+  .tabla-contenedor {
+    padding: 0;
+  }
 }
 
 /* Visitanos */
