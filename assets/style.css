@@ -37,6 +37,11 @@ body.modo-nocturno .titulo-tabla {
   color: #fff;
 }
 
+/* Modo nocturno: fondo oscuro para la celda de "Vida en naturaleza"*/
+body.modo-nocturno .vida-naturaleza {
+  background-color: #e0e0e0; 
+}
+
 body.modo-nocturno .titulo-mapa {
   color: #fff;
 }
@@ -450,7 +455,6 @@ body.modo-nocturno .btn-modo.active {
   font-size: 1rem;
   font-weight: bold;
   color: #333;
-  transition: background 0.3s ease;
 }
 
 .accordion-header:hover {
@@ -515,13 +519,32 @@ td {
   font-size: 0.85rem; /* reduce el tamaño en móvil */
 }
 
+/* Resaltar ultima celda */
+tbody tr:nth-child(4):hover td:last-child,
+tbody tr:nth-child(5):hover td:last-child{
+  background-color: #f9c765; 
+}
+
 thead th:hover {
   color: var(--border);
 }
 
-tbody {
-  text-align: justify;
+/* Estilo para la celda de "Vida en naturaleza" */
+.vida-naturaleza {
+  background-color: var(--bg); /* amarillo suave */
+  transition: background-color 0.3s ease;
 }
+
+/* Resaltar toda la fila al hacer hover */
+tbody tr:hover {
+  background: #f9c765; 
+}
+
+/* Si quieres que la celda de "Vida en naturaleza" no cambie de color al hacer hover */
+tbody tr:hover .vida-naturaleza {
+  background-color: inherit; /* hereda el color de la fila */
+}
+
 
 tbody tr:hover {
   background: var(--panel);
@@ -545,7 +568,8 @@ tfoot tr:hover {
   }
 }
 
-/* Visitanos */
+
+/* Seccion Visitanos */
 
 .titulo-mapa {
   width: 100%;

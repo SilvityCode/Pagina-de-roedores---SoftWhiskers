@@ -35,7 +35,6 @@ accordionHeaders.forEach(header => {
   });
 });
 
-
 // Formulario: regex y validacion para nombre, email y contraseña 
 
 document.addEventListener('DOMContentLoaded', () => {
