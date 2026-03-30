@@ -1,25 +1,51 @@
-// Boton modo oscuro/claro
+document.addEventListener("DOMContentLoaded", () => {
 
-// Seleccionar los botones con getElementbyid
-const btnDiurno = document.getElementById('modo-diurno')
-const btnNocturno = document.getElementById('modo-nocturno')
+  // MENU
+  const toggle = document.getElementById("menu-toggle");
+  const navLinks = document.querySelector(".nav-links");
 
-// Marcar "Modo diurno" (el boton se queda marcado)
-btnDiurno.classList.add('active')
+  toggle.addEventListener("click", () => {
+    const isActive = navLinks.classList.toggle("active");
 
-// Cambiar a modo diurno
-btnDiurno.addEventListener('click', () => {
-document.body.classList.remove('modo-nocturno')
-btnDiurno.classList.add('active')
-btnNocturno.classList.remove('active')
-})
+    // 👇 CAMBIO DE ICONO (dentro del click)
+    toggle.textContent = isActive ? "✖" : "☰";
+  });
 
-// Cambiar a modo nocturno
-btnNocturno.addEventListener('click', () => {
-document.body.classList.add('modo-nocturno')
-btnNocturno.classList.add('active')
-btnDiurno.classList.remove('active')
-})
+  // cerrar menú al hacer click en un link
+  document.querySelectorAll(".nav-links a").forEach(link => {
+    link.addEventListener("click", () => {
+      navLinks.classList.remove("active");
+      toggle.textContent = "☰";
+    });
+  });
+});
+
+  // cerrar menú al hacer click en un link
+  document.querySelectorAll(".nav-links a").forEach(link => {
+    link.addEventListener("click", () => {
+      navLinks.classList.remove("active");
+      toggle.textContent = "☰";
+    });
+
+  // MODO
+  const btnDiurno = document.getElementById('modo-diurno');
+  const btnNocturno = document.getElementById('modo-nocturno');
+
+  btnDiurno.classList.add('active');
+
+  btnDiurno.addEventListener('click', () => {
+    document.body.classList.remove('modo-nocturno');
+    btnDiurno.classList.add('active');
+    btnNocturno.classList.remove('active');
+  });
+
+  btnNocturno.addEventListener('click', () => {
+    document.body.classList.add('modo-nocturno');
+    btnNocturno.classList.add('active');
+    btnDiurno.classList.remove('active');
+  });
+
+});
 
 
 /* Boton desplegable en contenedores tarjeta */
