@@ -1,15 +1,31 @@
 import express from 'express';
 import sqlite3 from 'sqlite3';
 import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import bcrypt from 'bcrypt';
 
 const app = express();
 const PORT = 3000;
 
-// Middleware
+// ======================
+// RUTAS
+// ======================
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// ======================
+// MIDDLEWARE
+// ======================
 app.use(cors());
 app.use(express.json());
 
-// Base de datos
+// 🔥 SERVIR FRONTEND
+app.use(express.static(path.join(__dirname, '../public')));
+
+// ======================
+// BASE DE DATOS
+// ======================
 const db = new sqlite3.Database('./database.db', (err) => {
   if (err) {
     console.error("Error al conectar DB", err);
@@ -28,34 +44,91 @@ db.run(`
   )
 `);
 
-// Ruta prueba
+// ======================
+// RUTA PRINCIPAL
+// ======================
 app.get('/', (req, res) => {
-  res.send('Servidor funcionando');
+  res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
-// Registro
-app.post('/registro', (req, res) => {
+// ======================
+// REGISTRO (CON HASH)
+// ======================
+app.post('/registro', async (req, res) => {
+  console.log("📩 Petición recibida en /registro");
+
   const { nombre, email, password } = req.body;
 
   if (!nombre || !email || !password) {
     return res.status(400).json({ error: "Faltan datos" });
   }
 
-  const sql = `
-    INSERT INTO usuarios (nombre, email, password)
-    VALUES (?, ?, ?)
-  `;
+  try {
+    // 🔐 HASH CONTRASEÑA
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-  db.run(sql, [nombre, email, password], function(err) {
+    const sql = `
+      INSERT INTO usuarios (nombre, email, password)
+      VALUES (?, ?, ?)
+    `;
+
+    db.run(sql, [nombre, email, hashedPassword], function(err) {
+      if (err) {
+        console.log("❌ Error al registrar:", err.message);
+        return res.status(400).json({ error: "El usuario ya existe" });
+      }
+
+      console.log("✅ Usuario registrado");
+
+      res.status(200).json({ message: "Usuario registrado correctamente" });
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+});
+
+// ======================
+// LOGIN (CON BCRYPT)
+// ======================
+app.post('/login', (req, res) => {
+  console.log("🔐 Intento de login");
+
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ error: "Faltan datos" });
+  }
+
+  const sql = `SELECT * FROM usuarios WHERE email = ?`;
+
+  db.get(sql, [email], async (err, usuario) => {
     if (err) {
-      return res.status(400).json({ error: "El usuario ya existe" });
+      console.error(err);
+      return res.status(500).json({ error: "Error del servidor" });
     }
 
-    res.json({ message: "Usuario registrado correctamente" });
+    if (!usuario) {
+      return res.status(400).json({ error: "Usuario no encontrado" });
+    }
+
+    // 🔐 COMPARAR CONTRASEÑA
+    const passwordValida = await bcrypt.compare(password, usuario.password);
+
+    if (!passwordValida) {
+      return res.status(400).json({ error: "Contraseña incorrecta" });
+    }
+
+    console.log("✅ Login correcto");
+
+    res.json({ message: "Login correcto", usuario: usuario.nombre });
   });
 });
 
-// Iniciar servidor
+// ======================
+// INICIAR SERVIDOR
+// ======================
 app.listen(PORT, () => {
   console.log(`Servidor en http://localhost:${PORT}`);
 });
