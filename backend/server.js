@@ -127,6 +127,51 @@ app.post('/login', (req, res) => {
 });
 
 // ======================
+// ROEDORES
+// ======================
+app.get('/roedores', (req, res) => {
+  res.json([
+    {
+      id: 1,
+      nombre: "Hámster Sirio",
+      edad: "6 meses",
+      imagen: "/assets/img/Hamster.jpg"
+    },
+    {
+      id: 2,
+      nombre: "Cobaya",
+      edad: "1 año",
+      imagen: "/assets/img/Cobaya.jpg"
+    },
+    {
+      id: 3,
+      nombre: "Hamster Ruso",
+      edad: "1 año",
+    }
+  ]);
+});
+
+// ======================
+// ADOPCIONES
+// ======================
+app.post('/adoptar', (req, res) => {
+  const { email, roedor_id } = req.body;
+
+  const sql = `
+    INSERT INTO adopciones (usuario_email, roedor_id)
+    VALUES (?, ?)
+  `;
+
+  db.run(sql, [email, roedor_id], function(err) {
+    if (err) {
+      return res.status(500).json({ error: "Error al adoptar" });
+    }
+
+    res.json({ message: "Adopción realizada 🐹" });
+  });
+});
+
+// ======================
 // INICIAR SERVIDOR
 // ======================
 app.listen(PORT, () => {

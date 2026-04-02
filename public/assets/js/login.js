@@ -1,4 +1,4 @@
-document.getElementById("login-form").addEventListener("submit", function(e) {
+document.getElementById("login-form").addEventListener("submit", async function(e) {
   e.preventDefault();
 
   const email = document.getElementById("email").value;
@@ -9,5 +9,30 @@ document.getElementById("login-form").addEventListener("submit", function(e) {
     return;
   }
 
-  console.log("Login enviado:", { email, password });
+  try {
+    const res = await fetch("http://localhost:3000/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ email, password })
+    });
+
+    const data = await res.json();
+
+    console.log("RESPUESTA BACKEND:", data); // 👈 para debug
+
+    if (res.ok) {
+      localStorage.setItem("usuario", data.usuario);
+      localStorage.setItem("email", email);
+
+      window.location.href = "/pages/adopcion.html";
+    } else {
+      alert(data.error);
+    }
+
+  } catch (error) {
+    console.error(error);
+    alert("Error al conectar con el servidor");
+  }
 });
