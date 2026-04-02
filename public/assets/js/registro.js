@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!validarConfirmPassword()) valido = false;
 
     if (!valido) {
-      mostrarMensaje("Corrige los errores del formulario", true);
+      mostrarMensaje("Completa el formulario", true);
       return;
     }
 
