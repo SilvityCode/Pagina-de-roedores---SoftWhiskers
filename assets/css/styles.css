@@ -102,10 +102,6 @@ body.modo-nocturno #contacto strong {
   color: #fff;
 }
 
-body.modo-nocturno .login-link {
-  color: #000000; 
-}
-
 
 /* + Estilos Generales en modo diurno */
 * {
@@ -662,7 +658,7 @@ tfoot tr:hover {
 
 /* Estilos para formulario */ 
 
-#adopcion {
+#adopción {
   max-width: 600px;
   margin: 2rem auto;
   padding: 2rem;
@@ -727,7 +723,7 @@ textarea {
 }
 
 /* Botones del formulario */
-button[type="button"],
+button[type="submit"],
 button[type="reset"] {
   background: var(--accent);
   padding: 0.6rem 1.2rem;
@@ -741,7 +737,7 @@ button[type="reset"] {
   margin-right: 0.5rem;
 }
 
-button[type="button"]:hover,
+button[type="submit"]:hover,
 button[type="reset"]:hover {
   background: var(--bg);
   transform: scale(1.05);
@@ -847,64 +843,4 @@ button[type="reset"]:hover {
   border: 1px solid var(--border);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease;
-}
-
-/*estilos para login: link "inicia sesion"*/
-.login-link {
-  text-align: center;
-  margin-top: 15px;
-  font-size: 0.9rem;
-}
-
-.login-link a {
-  color: #8b5e3c;
-  font-weight: 600;
-}
-
-.login-link a:hover {
-  color: #5a3b25;
-  text-decoration: underline;
-}
-
-/*Estilos contenedor de pagina login*/
-.contenedor {
-  max-width: 800px;
-  margin: 50px auto;
-  background: #f5f5f5;
-  border-radius: 15px;
-  padding: 40px;
-}
-
-/*Estilos boton iniciar sesion*/
-.btn {
-  background: var(--accent);
-  padding: 0.6rem 1.2rem;
-  border-radius: 20px;
-  border: 2px solid var(--border);
-  cursor: pointer;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--text);
-  transition: all 0.3s ease;
-}
-
-.btn:hover {
-  background: var(--bg);
-  transform: scale(1.05);
-}
-
-.boton-login {
-  display: flex;
-  justify-content: center;
-  margin-top: 1.5rem;
-}
-
-.mensaje {
-  margin-top: 10px;
-  color: green;
-  font-weight: bold;
-}
-
-.oculto {
-  display: none;
 }
