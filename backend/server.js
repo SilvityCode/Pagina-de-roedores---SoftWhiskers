@@ -19,8 +19,6 @@ const __dirname = path.dirname(__filename);
 // ======================
 app.use(cors());
 app.use(express.json());
-
-// SERVIR FRONTEND
 app.use(express.static(path.join(__dirname, '../public')));
 
 // ======================
@@ -34,13 +32,13 @@ const db = new sqlite3.Database('./database.db', (err) => {
   }
 });
 
-// Crear tabla
 db.run(`
   CREATE TABLE IF NOT EXISTS usuarios (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nombre TEXT,
     email TEXT UNIQUE,
-    password TEXT
+    password TEXT,
+    comentario TEXT
   )
 `);
 
@@ -52,123 +50,88 @@ app.get('/', (req, res) => {
 });
 
 // ======================
-// REGISTRO (CON HASH)
+// REGISTRO
 // ======================
 app.post('/registro', async (req, res) => {
-  console.log("📩 Petición recibida en /registro");
-
-  const { nombre, email, password } = req.body;
+  const { nombre, email, password, comentario } = req.body;
 
   if (!nombre || !email || !password) {
     return res.status(400).json({ error: "Faltan datos" });
   }
 
   try {
-    // HASH CONTRASEÑA
     const hashedPassword = await bcrypt.hash(password, 10);
+    const sql = `INSERT INTO usuarios (nombre, email, password, comentario) VALUES (?, ?, ?, ?)`;
 
-    const sql = `
-      INSERT INTO usuarios (nombre, email, password)
-      VALUES (?, ?, ?)
-    `;
-
-    db.run(sql, [nombre, email, hashedPassword], function(err) {
-      if (err) {
-        console.log("❌ Error al registrar:", err.message);
-        return res.status(400).json({ error: "El usuario ya existe" });
-      }
-
-      console.log("✅ Usuario registrado");
-
+    db.run(sql, [nombre, email, hashedPassword, comentario], function(err) {
+      if (err) return res.status(400).json({ error: "El usuario ya existe" });
       res.status(200).json({ message: "Usuario registrado correctamente" });
     });
 
   } catch (error) {
-    console.error(error);
     res.status(500).json({ error: "Error interno del servidor" });
   }
 });
 
 // ======================
-// LOGIN (CON BCRYPT)
+// LOGIN
 // ======================
 app.post('/login', (req, res) => {
-  console.log("🔐 Intento de login");
-
   const { email, password } = req.body;
 
   if (!email || !password) {
     return res.status(400).json({ error: "Faltan datos" });
   }
 
-  const sql = `SELECT * FROM usuarios WHERE email = ?`;
+  db.get(`SELECT * FROM usuarios WHERE email = ?`, [email], async (err, usuario) => {
+    if (err) return res.status(500).json({ error: "Error del servidor" });
+    if (!usuario) return res.status(400).json({ error: "Usuario no encontrado" });
 
-  db.get(sql, [email], async (err, usuario) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ error: "Error del servidor" });
-    }
-
-    if (!usuario) {
-      return res.status(400).json({ error: "Usuario no encontrado" });
-    }
-
-    // 🔐 COMPARAR CONTRASEÑA
     const passwordValida = await bcrypt.compare(password, usuario.password);
-
-    if (!passwordValida) {
-      return res.status(400).json({ error: "Contraseña incorrecta" });
-    }
-
-    console.log("✅ Login correcto");
+    if (!passwordValida) return res.status(400).json({ error: "Contraseña incorrecta" });
 
     res.json({ message: "Login correcto", usuario: usuario.nombre });
   });
 });
 
 // ======================
-// ROEDORES
+// ROEDORES - Obtener por tipo
 // ======================
-app.get('/roedores', (req, res) => {
-  res.json([
-    {
-      id: 1,
-      nombre: "Hámster Sirio",
-      edad: "6 meses",
-      imagen: "/assets/img/Hamster.jpg"
-    },
-    {
-      id: 2,
-      nombre: "Cobaya",
-      edad: "1 año",
-      imagen: "/assets/img/Cobaya.jpg"
-    },
-    {
-      id: 3,
-      nombre: "Hamster Ruso",
-      edad: "1 año",
+app.get('/api/roedores/:tipo', (req, res) => {
+  const tipo = req.params.tipo;
+
+  db.all(
+    'SELECT * FROM roedores WHERE tipo = ? AND disponible = 1',
+    [tipo],
+    (err, rows) => {
+      if (err) return res.status(500).json({ error: 'Error al obtener roedores' });
+      res.json(rows);
     }
-  ]);
+  );
 });
 
 // ======================
-// ADOPCIONES
+// ADOPTAR
 // ======================
 app.post('/adoptar', (req, res) => {
   const { email, roedor_id } = req.body;
 
-  const sql = `
-    INSERT INTO adopciones (usuario_email, roedor_id)
-    VALUES (?, ?)
-  `;
+  db.get(
+    'SELECT * FROM roedores WHERE id = ? AND disponible = 1',
+    [roedor_id],
+    (err, roedor) => {
+      if (err || !roedor) return res.status(400).json({ error: 'Roedor no disponible' });
 
-  db.run(sql, [email, roedor_id], function(err) {
-    if (err) {
-      return res.status(500).json({ error: "Error al adoptar" });
+      const sqlAdopcion = 'INSERT INTO adopciones (usuario_email, roedor_id) VALUES (?, ?)';
+      db.run(sqlAdopcion, [email, roedor_id], function(err) {
+        if (err) return res.status(500).json({ error: 'Error al adoptar' });
+
+        db.run('UPDATE roedores SET disponible = 0 WHERE id = ?', [roedor_id]);
+
+        res.json({ message: `¡Has adoptado a ${roedor.nombre}! 🐹` });
+      });
     }
-
-    res.json({ message: "Adopción realizada 🐹" });
-  });
+  );
 });
 
 // ======================

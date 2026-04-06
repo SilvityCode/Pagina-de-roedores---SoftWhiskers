@@ -8,64 +8,111 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  // ✅ mostrar usuario
+  // ✅ Mostrar usuario
   document.getElementById('bienvenida').textContent =
-    "Bienvenido " + usuario + " 🐭";
+    "Bienvenid@ " + usuario + " 🐭" + "¿qué te gustaria adoptar?";
 
-  // 🔓 logout
+  // 🔓 Logout
   document.getElementById('logout').addEventListener('click', () => {
     localStorage.removeItem('usuario');
+    localStorage.removeItem('email');
     window.location.href = "/pages/login.html";
   });
 
 });
 
 // ======================
-// CARGAR ROEDORES
+// TOGGLE DESPLEGABLE
 // ======================
-async function cargarRoedores() {
-  const res = await fetch('/roedores');
-  const roedores = await res.json();
+window.toggle = async (tipo) => {
+  const contenedor = document.getElementById(tipo);
+  const estaBaAbierto = !contenedor.classList.contains('oculto');
 
-  const contenedor = document.getElementById('contenedor-roedores');
-
-  roedores.forEach(r => {
-    const card = document.createElement('div');
-
-    card.innerHTML = `
-      <h3>${r.nombre}</h3>
-      <img src="${r.imagen}" width="150">
-      <p>Edad: ${r.edad}</p>
-      <button onclick="adoptar(${r.id})">Adoptar ❤️</button>
-      <hr>
-    `;
-
-    contenedor.appendChild(card);
+  // Cerrar todos primero
+  document.querySelectorAll('.contenedor').forEach(div => {
+    div.classList.add('oculto');
+    div.innerHTML = '';
   });
-}
 
-console.log("Cargando roedores...");
-cargarRoedores();
+  // Si ya estaba abierto, solo lo cerramos
+  if (estaBaAbierto) return;
+
+  // Si estaba cerrado, cargamos y abrimos
+  try {
+    const url = '/api/roedores/' + tipo;
+    const res = await fetch(url);
+    const roedores = await res.json();
+
+    if (roedores.length === 0) {
+      contenedor.innerHTML = `
+        <p class="sin-roedores">No hay ${tipo}s disponibles ahora mismo 😊</p>
+      `;
+    } else {
+      contenedor.innerHTML = roedores.map(r => `
+        <div class="tarjeta-roedor">
+          <h3>${r.nombre}</h3>
+          <p>📅 Edad: ${r.edad}</p>
+          <button class="btn-adoptar" onclick="adoptar(${r.id}, '${r.nombre}')">
+            Adoptar ❤️
+          </button>
+        </div>
+      `).join('');
+    }
+
+    contenedor.classList.remove('oculto');
+
+  } catch (err) {
+    contenedor.innerHTML = `<p class="error">Error al cargar los roedores 😥</p>`;
+    contenedor.classList.remove('oculto');
+  }
+};
 
 // ======================
 // ADOPTAR
 // ======================
-window.adoptar = async (id) => {
-
+window.adoptar = async (id, nombre) => {
   const email = localStorage.getItem('email');
 
-  const res = await fetch('/adoptar', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      email,
-      roedor_id: id
-    })
-  });
+  if (!email) {
+    mostrarMensaje('No se encontró tu email. Vuelve a iniciar sesión.', 'error');
+    return;
+  }
 
-  const data = await res.json();
+  try {
+    const res = await fetch('/adoptar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, roedor_id: id })
+    });
 
-  alert(data.message);
+    const data = await res.json();
+
+    if (res.ok) {
+      mostrarMensaje(`¡Has adoptado a ${nombre}! 🐹🎉`, 'exito');
+      // Recargar la sección para que desaparezca el roedor adoptado
+      const tarjeta = document.querySelector(`[onclick="adoptar(${id}, '${nombre}')"]`)
+        ?.closest('.tarjeta');
+      if (tarjeta) tarjeta.remove();
+    } else {
+      mostrarMensaje(data.error || 'Error al adoptar', 'error');
+    }
+
+  } catch (err) {
+    mostrarMensaje('Error de conexión', 'error');
+  }
 };
+
+// ======================
+// MENSAJE FEEDBACK
+// ======================
+function mostrarMensaje(texto, tipo) {
+  const div = document.getElementById('mensaje');
+  div.textContent = texto;
+  div.className = `mensaje ${tipo}`;
+  div.classList.remove('oculto');
+
+  // Se oculta solo a los 3 segundos
+  setTimeout(() => {
+    div.classList.add('oculto');
+  }, 3000);
+}

@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const emailInput = document.getElementById('email');
   const passwordInput = document.getElementById('password');
   const confirmPasswordInput = document.getElementById('confirm-password');
+  const comentarioInput = document.getElementById("comentarios");
 
   const errorNombre = document.getElementById('error-nombre');
   const errorEmail = document.getElementById('error-email');
@@ -122,7 +123,8 @@ document.addEventListener('DOMContentLoaded', () => {
         body: JSON.stringify({
           nombre: nombreInput.value,
           email: emailInput.value,
-          password: passwordInput.value
+          password: passwordInput.value,
+          comentario: comentarioInput.value
         })
       });
 
