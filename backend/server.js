@@ -20,7 +20,7 @@ const __dirname = path.dirname(__filename);
 app.use(cors());
 app.use(express.json());
 
-// 🔥 SERVIR FRONTEND
+// SERVIR FRONTEND
 app.use(express.static(path.join(__dirname, '../public')));
 
 // ======================
@@ -64,7 +64,7 @@ app.post('/registro', async (req, res) => {
   }
 
   try {
-    // 🔐 HASH CONTRASEÑA
+    // HASH CONTRASEÑA
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const sql = `
