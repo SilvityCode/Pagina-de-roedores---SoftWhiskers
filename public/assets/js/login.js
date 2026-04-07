@@ -1,8 +1,29 @@
+// ======================
+// VERIFICACIÓN INMEDIATA
+// ======================
+(function() {
+  const usuario = localStorage.getItem('usuario') || sessionStorage.getItem('usuario');
+  const rol = localStorage.getItem('rol') || sessionStorage.getItem('rol');
+
+  if (usuario && rol) {
+    // Redirigir según rol si ya hay sesión activa
+    if (rol === "admin") {
+      window.location.replace("/pages/admin.html");
+    } else {
+      window.location.replace("/pages/adopcion.html");
+    }
+  }
+})();
+
+// ======================
+// LOGIN FORM
+// ======================
 document.getElementById("login-form").addEventListener("submit", async function(e) {
   e.preventDefault();
 
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
+  const recuerdame = document.querySelector('input[name="remember"]').checked;
 
   if (!email || !password) {
     mostrarError("Completa todos los campos");
@@ -19,17 +40,18 @@ document.getElementById("login-form").addEventListener("submit", async function(
     const data = await res.json();
 
     if (res.ok) {
-      localStorage.setItem("usuario", data.usuario);
-      localStorage.setItem("email", email);
-      localStorage.setItem("rol", data.rol);
-      
+      const storage = recuerdame ? localStorage : sessionStorage;
+
+      storage.setItem("usuario", data.usuario);
+      storage.setItem("email", email);
+      storage.setItem("rol", data.rol);
+
       if (data.rol === "admin") {
-        window.location.href = "/pages/admin.html";
+        window.location.replace("/pages/admin.html");
+      } else {
+        window.location.replace("/pages/adopcion.html");
       }
-      else {
-        window.location.href = "/pages/adopcion.html";
-      }
-      
+
     } else {
       mostrarError(data.error);
     }
@@ -39,8 +61,20 @@ document.getElementById("login-form").addEventListener("submit", async function(
   }
 });
 
+// ======================
+// MOSTRAR ERROR
+// ======================
 function mostrarError(mensaje) {
   const p = document.getElementById("error-login");
   p.textContent = mensaje;
   p.classList.remove("oculto");
 }
+
+// ======================
+// PREVENIR PÁGINA EN CACHE
+// ======================
+window.addEventListener('pageshow', (event) => {
+  if (event.persisted) {
+    window.location.replace("/pages/login.html");
+  }
+});

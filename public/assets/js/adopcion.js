@@ -1,11 +1,34 @@
-document.addEventListener('DOMContentLoaded', () => {
+// ======================
+// VERIFICACIÓN INMEDIATA
+// ======================
+(function() {
+  const usuario = localStorage.getItem('usuario') || sessionStorage.getItem('usuario');
+  if (!usuario) {
+    window.location.replace("/pages/login.html");
+  }
+})();
 
-  const usuario = localStorage.getItem('usuario');
+// ======================
+// RECARGAR SI VIENE DEL HISTORIAL
+// ======================
+window.addEventListener('pageshow', (event) => {
+  if (event.persisted) {
+    window.location.replace("/pages/login.html");
+  }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const usuario = localStorage.getItem('usuario') || sessionStorage.getItem('usuario');
 
   // 🔴 NO LOGUEADO → fuera
   if (!usuario) {
     window.location.href = "/pages/login.html";
     return;
+  }
+
+  // Si la página fue cargada desde el historial, forzar recarga
+  if (performance.getEntriesByType("navigation")[0].type === "back_forward") {
+    window.location.reload();
   }
 
   // ✅ Mostrar usuario
@@ -16,9 +39,12 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('logout').addEventListener('click', () => {
     localStorage.removeItem('usuario');
     localStorage.removeItem('email');
-    window.location.href = "/pages/login.html";
+    localStorage.removeItem('rol');
+    sessionStorage.removeItem('usuario');
+    sessionStorage.removeItem('email');
+    sessionStorage.removeItem('rol');
+    window.location.replace("/pages/login.html");
   });
-
 });
 
 // ======================
@@ -71,7 +97,7 @@ window.toggle = async (tipo) => {
 // ADOPTAR
 // ======================
 window.adoptar = async (id, nombre) => {
-  const email = localStorage.getItem('email');
+  const email = localStorage.getItem('email') || sessionStorage.getItem('email');
 
   if (!email) {
     mostrarMensaje('No se encontró tu email. Vuelve a iniciar sesión.', 'error');
@@ -88,7 +114,6 @@ window.adoptar = async (id, nombre) => {
     const data = await res.json();
 
     if (res.ok) {
-      // Mostrar el mensaje que viene del backend
       mostrarMensaje(data.message, 'exito');
 
       // Recargar la sección para que desaparezca el roedor adoptado
@@ -113,7 +138,6 @@ function mostrarMensaje(texto, tipo) {
   div.className = `mensaje ${tipo}`;
   div.classList.remove('oculto');
 
-  // Se oculta solo a los 3 segundos
   setTimeout(() => {
     div.classList.add('oculto');
   }, 3000);
