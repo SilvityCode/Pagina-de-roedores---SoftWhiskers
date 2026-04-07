@@ -21,7 +21,15 @@ document.getElementById("login-form").addEventListener("submit", async function(
     if (res.ok) {
       localStorage.setItem("usuario", data.usuario);
       localStorage.setItem("email", email);
-      window.location.href = "/pages/adopcion.html";
+      localStorage.setItem("rol", data.rol);
+      
+      if (data.rol === "admin") {
+        window.location.href = "/pages/admin.html";
+      }
+      else {
+        window.location.href = "/pages/adopcion.html";
+      }
+      
     } else {
       mostrarError(data.error);
     }

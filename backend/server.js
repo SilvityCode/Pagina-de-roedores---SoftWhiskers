@@ -64,7 +64,15 @@ app.post('/registro', async (req, res) => {
     const sql = `INSERT INTO usuarios (nombre, email, password, comentario) VALUES (?, ?, ?, ?)`;
 
     db.run(sql, [nombre, email, hashedPassword, comentario], function(err) {
-      if (err) return res.status(400).json({ error: "El usuario ya existe" });
+      if (err) {
+        console.error("ERROR SQLITE:", err);
+
+        if (err.message.includes("UNIQUE")) {
+          return res.status(400).json({ error: "El usuario ya existe" });
+        }
+
+        return res.status(500).json({ error: "Error en base de datos" });
+      }
       res.status(200).json({ message: "Usuario registrado correctamente" });
     });
 
@@ -101,7 +109,7 @@ app.get('/api/roedores/:tipo', (req, res) => {
   const tipo = req.params.tipo;
 
   db.all(
-    'SELECT * FROM roedores WHERE tipo = ? AND disponible = 1',
+    'SELECT * FROM roedores WHERE tipo = ? AND estado = "disponible"',
     [tipo],
     (err, rows) => {
       if (err) return res.status(500).json({ error: 'Error al obtener roedores' });
@@ -117,22 +125,76 @@ app.post('/adoptar', (req, res) => {
   const { email, roedor_id } = req.body;
 
   db.get(
-    'SELECT * FROM roedores WHERE id = ? AND disponible = 1',
+    'SELECT * FROM roedores WHERE id = ? AND estado = "disponible"',
     [roedor_id],
     (err, roedor) => {
-      if (err || !roedor) return res.status(400).json({ error: 'Roedor no disponible' });
+      if (err || !roedor) {
+        return res.status(400).json({ error: 'Roedor no disponible' });
+      }
 
-      const sqlAdopcion = 'INSERT INTO adopciones (usuario_email, roedor_id) VALUES (?, ?)';
-      db.run(sqlAdopcion, [email, roedor_id], function(err) {
-        if (err) return res.status(500).json({ error: 'Error al adoptar' });
+      const sql = `
+        UPDATE roedores 
+        SET estado = 'pendiente', usuario_email = ? 
+        WHERE id = ?
+      `;
 
-        db.run('UPDATE roedores SET disponible = 0 WHERE id = ?', [roedor_id]);
+      db.run(sql, [email, roedor_id], function(err) {
+        if (err) return res.status(500).json({ error: 'Error al solicitar adopción' });
 
-        res.json({ message: `¡Has adoptado a ${roedor.nombre}! 🐹` });
+        res.json({ message: `Solicitud enviada para adoptar a ${roedor.nombre} ⏳` });
       });
     }
   );
 });
+
+// ======================
+// ADMIN - VER SOLICITUDES
+// ======================
+app.get('/admin/solicitudes', (req, res) => {
+  db.all(
+    'SELECT * FROM roedores WHERE estado = "pendiente"',
+    [],
+    (err, rows) => {
+      if (err) return res.status(500).json({ error: 'Error al obtener solicitudes' });
+      res.json(rows);
+    }
+  );
+});
+
+// ======================
+// ADMIN - CONFIRMAR
+// ======================
+app.post('/admin/confirmar', (req, res) => {
+  const { roedor_id } = req.body;
+
+  db.run(
+    'UPDATE roedores SET estado = "adoptado" WHERE id = ?',
+    [roedor_id],
+    function(err) {
+      if (err) return res.status(500).json({ error: 'Error al confirmar' });
+
+      res.json({ message: 'Adopción confirmada ✅' });
+    }
+  );
+});
+
+// ======================
+// ADMIN - RECHAZAR
+// ======================
+app.post('/admin/rechazar', (req, res) => {
+  const { roedor_id } = req.body;
+
+  db.run(
+    'UPDATE roedores SET estado = "disponible", usuario_email = NULL WHERE id = ?',
+    [roedor_id],
+    function(err) {
+      if (err) return res.status(500).json({ error: 'Error al rechazar' });
+
+      res.json({ message: 'Solicitud rechazada ❌' });
+    }
+  );
+});
+
 
 // ======================
 // INICIAR SERVIDOR

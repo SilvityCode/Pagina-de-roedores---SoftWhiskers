@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
           nombre: nombreInput.value,
           email: emailInput.value,
           password: passwordInput.value,
-          comentario: comentarioInput.value
+          comentario: comentarioInput?.value || ""
         })
       });
 

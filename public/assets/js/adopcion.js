@@ -88,10 +88,12 @@ window.adoptar = async (id, nombre) => {
     const data = await res.json();
 
     if (res.ok) {
-      mostrarMensaje(`¡Has adoptado a ${nombre}! 🐹🎉`, 'exito');
+      // Mostrar el mensaje que viene del backend
+      mostrarMensaje(data.message, 'exito');
+
       // Recargar la sección para que desaparezca el roedor adoptado
       const tarjeta = document.querySelector(`[onclick="adoptar(${id}, '${nombre}')"]`)
-        ?.closest('.tarjeta');
+        ?.closest('.tarjeta-roedor');
       if (tarjeta) tarjeta.remove();
     } else {
       mostrarMensaje(data.error || 'Error al adoptar', 'error');
