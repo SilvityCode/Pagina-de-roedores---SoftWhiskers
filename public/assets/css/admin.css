@@ -1,0 +1,279 @@
+/* ======================
+   PANEL DE ADMINISTRACIÓN
+   ====================== */
+
+/* Variables extra para el admin */
+:root {
+  --admin-green:    #4a7c59;
+  --admin-green-bg: #e8f3ec;
+  --admin-red:      #b94040;
+  --admin-red-bg:   #fbeaea;
+  --admin-yellow:   #c8951a;
+  --admin-sand:     #d4bfa0;
+  --admin-bark:     #3b2f1e;
+  --admin-muted:    #8a7560;
+}
+
+body.admin {
+  background: linear-gradient(to right, #e7e0d4, #ddc493);
+  min-height: 100vh;
+}
+
+/* Header del admin */
+.admin-header {
+  background: #3b2f1e;
+  color: #f5efe6;
+  padding: 0 2rem;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+}
+
+.admin-titulo {
+  font-size: 1.3rem;
+  color: #f5efe6 !important;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.admin-subtitulo {
+  color: var(--admin-sand);
+  font-size: 0.75rem;
+  font-weight: 300;
+  margin-left: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+#btn-logout {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.3);
+  color: #f5efe6;
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+#btn-logout:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.6);
+}
+
+/* Main */
+.admin-main {
+  max-width: 960px;
+  margin: 2.5rem auto;
+  padding: 0 1.5rem;
+}
+
+/* Stats */
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+.stat-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 1.2rem 1.5rem;
+  border-left: 4px solid var(--admin-sand);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.stat-card.pendientes  { border-color: var(--admin-yellow); }
+.stat-card.confirmadas { border-color: var(--admin-green); }
+.stat-card.rechazadas  { border-color: var(--admin-red); }
+
+.stat-card .num {
+  font-size: 2rem;
+  font-weight: bold;
+  line-height: 1;
+  margin-bottom: 0.3rem;
+}
+
+.stat-card.pendientes  .num { color: var(--admin-yellow); }
+.stat-card.confirmadas .num { color: var(--admin-green); }
+.stat-card.rechazadas  .num { color: var(--admin-red); }
+
+.stat-card .label {
+  font-size: 0.78rem;
+  color: var(--admin-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 500;
+}
+
+/* Título sección */
+.admin-seccion-titulo {
+  font-size: 1.3rem;
+  color: #3b2f1e;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--admin-sand);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Lista solicitudes */
+#lista-solicitudes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.solicitud-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 1.2rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  border: 1px solid rgba(212,191,160,0.4);
+  animation: adminFadeIn 0.3s ease;
+}
+
+@keyframes adminFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.solicitud-info { flex: 1; }
+
+.solicitud-nombre {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #3b2f1e;
+  margin-bottom: 0.2rem;
+}
+
+.solicitud-meta {
+  font-size: 0.82rem;
+  color: var(--admin-muted);
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.solicitud-meta span {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.badge-tipo {
+  display: inline-block;
+  background: #ede0d0;
+  color: #5c4a32;
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.15rem 0.5rem;
+  border-radius: 20px;
+  border: 1px solid var(--admin-sand);
+}
+
+.solicitud-acciones {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.btn-confirmar,
+.btn-rechazar {
+  border-radius: 10px;
+  padding: 0.55rem 1.1rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s, background 0.2s;
+}
+
+.btn-confirmar {
+  background: var(--admin-green-bg);
+  color: var(--admin-green);
+  border: 1px solid rgba(74,124,89,0.3);
+}
+
+.btn-confirmar:hover {
+  background: var(--admin-green);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(74,124,89,0.3);
+}
+
+.btn-rechazar {
+  background: var(--admin-red-bg);
+  color: var(--admin-red);
+  border: 1px solid rgba(185,64,64,0.3);
+}
+
+.btn-rechazar:hover {
+  background: var(--admin-red);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(185,64,64,0.3);
+}
+
+/* Estado vacío */
+.vacio {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--admin-muted);
+  background: #fff;
+  border-radius: 14px;
+  border: 1px dashed var(--admin-sand);
+}
+
+.vacio .icono { font-size: 2.5rem; margin-bottom: 0.5rem; }
+.vacio p { font-size: 0.9rem; }
+
+/* Loading */
+.admin-loading {
+  text-align: center;
+  padding: 2rem;
+  color: var(--admin-muted);
+  font-size: 0.9rem;
+}
+
+/* Toast */
+#toast {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  padding: 0.8rem 1.4rem;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s, transform 0.3s;
+  pointer-events: none;
+  z-index: 999;
+}
+
+#toast.show  { opacity: 1; transform: translateY(0); }
+#toast.exito { background: var(--admin-green); color: #fff; }
+#toast.error { background: var(--admin-red);   color: #fff; }
+
+/* Responsive */
+@media (max-width: 600px) {
+  .admin-stats    { grid-template-columns: 1fr; }
+  .solicitud-card { flex-direction: column; align-items: flex-start; }
+}
+
+
+

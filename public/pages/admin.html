@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SoftWhiskers · Panel Admin</title>
+  <link rel="stylesheet" href="/assets/css/admin.css" />
+</head>
+<body class="admin">
+
+  <header class="admin-header">
+    <h1 class="admin-titulo">SoftWhiskers: la Madriguera<span class="admin-subtitulo">Panel Admin</span></h1>
+    <button id="btn-logout">Cerrar sesión</button>
+  </header>
+
+  <main class="admin-main">
+
+    <!-- Stats -->
+    <div class="admin-stats">
+      <div class="stat-card pendientes">
+        <div class="num" id="stat-pendientes">-</div>
+        <div class="label">Pendientes</div>
+      </div>
+      <div class="stat-card confirmadas">
+        <div class="num" id="stat-confirmadas">-</div>
+        <div class="label">Confirmadas</div>
+      </div>
+      <div class="stat-card rechazadas">
+        <div class="num" id="stat-rechazadas">-</div>
+        <div class="label">Rechazadas hoy</div>
+      </div>
+    </div>
+
+    <!-- Solicitudes -->
+    <h2 class="admin-seccion-titulo">🐾 Solicitudes de adopción</h2>
+    <div id="lista-solicitudes">
+      <div class="admin-loading">Cargando solicitudes...</div>
+    </div>
+
+  </main>
+
+  <div id="toast"></div>
+
+  <script src="/assets/js/admin.js"></script>
+</body>
+</html>

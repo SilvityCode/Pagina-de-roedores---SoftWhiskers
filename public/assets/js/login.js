@@ -45,6 +45,7 @@ document.getElementById("login-form").addEventListener("submit", async function(
       storage.setItem("usuario", data.usuario);
       storage.setItem("email", email);
       storage.setItem("rol", data.rol);
+      storage.setItem("token", data.token);
 
       if (data.rol === "admin") {
         window.location.replace("/pages/admin.html");

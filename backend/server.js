@@ -55,6 +55,26 @@ db.run(`
 `);
 
 // ======================
+// MIDDLEWARE SOLO ADMIN
+// ======================
+function soloAdmin(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) return res.status(401).json({ error: 'No autorizado' });
+
+  try {
+    const payload = jwt.verify(token, JWT_SECRET);
+    if (payload.rol !== 'admin') return res.status(403).json({ error: 'Acceso denegado' });
+    req.usuario = payload;
+    next();
+  } catch (err) {
+    return res.status(401).json({ error: 'Token inválido o expirado' });
+  }
+}
+
+
+// ======================
 // RUTA PRINCIPAL
 // ======================
 app.get('/', (req, res) => {
@@ -110,7 +130,7 @@ app.post('/login', (req, res) => {
     const passwordValida = await bcrypt.compare(password, usuario.password);
     if (!passwordValida) return res.status(400).json({ error: "Contraseña incorrecta" });
 
-    res.json({ message: "Login correcto", usuario: usuario.nombre });
+    res.json({ message: "Login correcto", usuario: usuario.nombre, email: usuario.email, rol: usuario.rol });
   });
 });
 
