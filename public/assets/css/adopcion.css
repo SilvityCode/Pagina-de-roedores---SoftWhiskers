@@ -165,13 +165,32 @@ footer {
 }
 
 
-#logout {
-  margin: 0 auto;
-  display: block;
-}
-
 /* Sin roedores disponibles */
 .sin-roedores {
   color: #8a7560;
   font-style: italic;
+}
+
+
+/*Para las notificaciones de la adopcion del admin al usuario*/
+
+.notificacion {
+  border-radius: 12px;
+  padding: 1rem 1.2rem;
+  margin-bottom: 1.2rem;
+  font-weight: 500;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+.notificacion.exito {
+  background: #d4edda;
+  color: #3a6b3a;
+  border: 1px solid #a8d5a8;
+}
+
+.notificacion.pendiente {
+  background: #fdf4e1;
+  color: #7a5c1a;
+  border: 1px solid #e8d08a;
 }

@@ -4,6 +4,7 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 const app = express();
 const PORT = 3000;
@@ -13,6 +14,7 @@ const PORT = 3000;
 // ======================
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const JWT_SECRET = 'softwhiskers_clave_secreta_2024';
 
 // ======================
 // MIDDLEWARE
@@ -50,7 +52,8 @@ db.run(`
     nombre TEXT,
     email TEXT UNIQUE,
     password TEXT,
-    comentario TEXT
+    comentario TEXT,
+    rol TEXT
   )
 `);
 
@@ -130,7 +133,13 @@ app.post('/login', (req, res) => {
     const passwordValida = await bcrypt.compare(password, usuario.password);
     if (!passwordValida) return res.status(400).json({ error: "Contraseña incorrecta" });
 
-    res.json({ message: "Login correcto", usuario: usuario.nombre, email: usuario.email, rol: usuario.rol });
+    const token = jwt.sign(
+      { email: usuario.email, rol: usuario.rol || 'user' },
+      JWT_SECRET,
+      { expiresIn: '2h' }
+    );
+
+    res.json({ message: "Login correcto", usuario: usuario.nombre, email: usuario.email, rol: usuario.rol, token});
   });
 });
 
@@ -173,7 +182,7 @@ app.post('/adoptar', (req, res) => {
       db.run(sql, [email, roedor_id], function(err) {
         if (err) return res.status(500).json({ error: 'Error al solicitar adopción' });
 
-        res.json({ message: `Solicitud enviada para adoptar a ${roedor.nombre} ⏳` });
+        res.json({ message: `Solicitud enviada para adoptar a ${roedor.nombre} ⏳. La respuesta será habilitada en 5 días hábiles.` });
       });
     }
   );
@@ -196,33 +205,101 @@ app.get('/admin/solicitudes', (req, res) => {
 // ======================
 // ADMIN - CONFIRMAR
 // ======================
-app.post('/admin/confirmar', (req, res) => {
+app.post('/admin/confirmar', soloAdmin, (req, res) => {
   const { roedor_id } = req.body;
 
-  db.run(
-    'UPDATE roedores SET estado = "adoptado" WHERE id = ?',
-    [roedor_id],
-    function(err) {
-      if (err) return res.status(500).json({ error: 'Error al confirmar' });
+  // Primero obtenemos los datos del roedor
+  db.get('SELECT * FROM roedores WHERE id = ?', [roedor_id], (err, roedor) => {
+    if (err || !roedor) return res.status(500).json({ error: 'Roedor no encontrado' });
 
-      res.json({ message: 'Adopción confirmada ✅' });
-    }
-  );
+    const fecha = new Date().toLocaleDateString('es-ES');
+
+    // Actualizamos el estado del roedor
+    db.run(
+      'UPDATE roedores SET estado = "adoptado" WHERE id = ?',
+      [roedor_id],
+      function(err) {
+        if (err) return res.status(500).json({ error: 'Error al confirmar' });
+
+        // Insertamos el registro en la tabla adopciones
+        db.run(
+          `INSERT INTO adopciones (usuario_email, roedor_id, nombre_roedor, tipo_roedor, fecha, estado)
+           VALUES (?, ?, ?, ?, ?, ?)`,
+          [roedor.usuario_email, roedor.id, roedor.nombre, roedor.tipo, fecha, "aceptada"],
+          function(err) {
+            if (err) return res.status(500).json({ error: 'Error al registrar adopción' });
+            res.json({ message: 'Adopción confirmada ✅' });
+          }
+        );
+      }
+    );
+  });
 });
 
 // ======================
 // ADMIN - RECHAZAR
 // ======================
-app.post('/admin/rechazar', (req, res) => {
+app.post('/admin/rechazar', soloAdmin, (req, res) => {
   const { roedor_id } = req.body;
 
-  db.run(
-    'UPDATE roedores SET estado = "disponible", usuario_email = NULL WHERE id = ?',
-    [roedor_id],
-    function(err) {
-      if (err) return res.status(500).json({ error: 'Error al rechazar' });
+  db.get('SELECT * FROM roedores WHERE id = ?', [roedor_id], (err, roedor) => {
+    if (err || !roedor) {
+      return res.status(500).json({ error: 'Roedor no encontrado' });
+    }
 
-      res.json({ message: 'Solicitud rechazada ❌' });
+    const fecha = new Date().toLocaleDateString('es-ES');
+
+    // Guardamos el rechazo
+    db.run(
+      `INSERT INTO adopciones (usuario_email, roedor_id, nombre_roedor, tipo_roedor, fecha, estado)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [roedor.usuario_email, roedor.id, roedor.nombre, roedor.tipo, fecha, "rechazada"],
+      function(err) {
+        if (err) return res.status(500).json({ error: 'Error al guardar rechazo' });
+
+        // 🔄 Liberar roedor
+        db.run(
+          'UPDATE roedores SET estado = "disponible", usuario_email = NULL WHERE id = ?',
+          [roedor_id],
+          function(err) {
+            if (err) return res.status(500).json({ error: 'Error al rechazar' });
+
+            res.json({ message: 'Solicitud rechazada ❌' });
+          }
+        );
+      }
+    );
+  });
+});
+
+// ======================   
+// NOTIFICACIONES PARA USUARIO
+// ======================
+app.get('/api/mis-notificaciones', (req, res) => {
+  const email = req.query.email;
+  if (!email) return res.status(400).json({ error: 'Falta email' });
+
+  db.get(
+    'SELECT nombre, tipo, estado FROM roedores WHERE usuario_email = ?',
+    [email],
+    (err, roedor) => {
+      if (err) return res.status(500).json({ error: 'Error del servidor' });
+
+      db.get(
+        `SELECT nombre_roedor, tipo_roedor, estado 
+         FROM adopciones 
+         WHERE usuario_email = ? 
+         ORDER BY id DESC LIMIT 1`,
+        [email],
+        (err, adopcion) => {
+          if (err) return res.status(500).json({ error: 'Error del servidor' });
+
+          res.json({
+            pendiente: roedor && roedor.estado === 'pendiente' ? roedor : null,
+            resultado: adopcion || null
+          });
+        }
+      );
     }
   );
 });
