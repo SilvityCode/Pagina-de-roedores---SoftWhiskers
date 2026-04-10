@@ -1,64 +1,79 @@
-# 🌐 Proyecto Web Full Stack (En Desarrollo)
+# 🐭 SoftWhiskers: la Madriguera
 
-Este proyecto consiste en el desarrollo de una aplicación web, actualmente en proceso de evolución desde una **demo frontend** hacia una arquitectura completa con **backend y base de datos**.
+Aplicación web full stack para la gestión de adopciones de roedores.
+
+> [!IMPORTANT]
+> Actualmente en desarrollo activo, con una **demo frontend** disponible en GitHub Pages y el **backend completo** en rama separada.
 
 ---
 
 ## 🚀 Estado del proyecto
 
-🔹 **Frontend (Demo disponible)**
-Actualmente se encuentra disponible una versión funcional del frontend, desarrollada con:
-
-* HTML5
-* CSS3
-* JavaScript
-
-👉 Esta demo permite visualizar el diseño, la estructura y la interactividad de la aplicación.
-
-🔹 **Backend (En desarrollo)**
-Actualmente estoy trabajando en la implementación del backend y la integración con base de datos, incluyendo:
-
-* Arquitectura modular
-* Manejo de rutas y controladores
-* Operaciones CRUD
-* Validación de datos
+| Capa | Estado |
+|------|--------|
+| Frontend (demo) | ✅ Disponible en GitHub Pages |
+| Backend + Base de datos | ✅ Funcional — rama `Features-backend` |
 
 ---
 
-## 🛠️ Tecnologías utilizadas
+## ✨ Funcionalidades
+
+### 👤 Usuarios
+- Registro e inicio de sesión con contraseña encriptada (bcrypt)
+- Autenticación mediante JWT con expiración
+- Sesión persistente con `localStorage` / `sessionStorage`
+
+### 🐹 Adopciones
+- Explorar roedores disponibles por tipo (hámsters, ratones, cobayas...)
+- Solicitar la adopción de un roedor
+- Mensaje de solicitud pendiente **persistente** entre recargas y cierres de sesión
+- Notificación automática al usuario cuando el admin confirma o rechaza (polling cada 5s)
+- Notificación cerrable con X una vez leída
+
+### 🛡️ Panel de administración
+- Vista de solicitudes pendientes, confirmadas y rechazadas
+- Confirmar o rechazar solicitudes de adopción
+- Registro automático de todas las adopciones con fecha y estado
+
+> [!TIP]
+> Para probar la aplicación puedes registrar tu propio usuario desde la página de registro, o contactarme para solicitar credenciales de prueba.
+
+---
+
+## 🛠️ Tecnologías
 
 **Frontend**
+- HTML5, CSS3, JavaScript (ES6+)
 
-* HTML5
-* CSS3
-* JavaScript (ES6+)
+**Backend**
+- Node.js + Express.js
+- JWT (autenticación)
+- bcrypt (encriptación de contraseñas)
 
-**Backend (en progreso)**
-
-* Node.js
-* Express.js
-* bcrypt (encriptación de contraseñas)
-
-**Base de datos (en progreso)**
-
-* SQLite
+**Base de datos**
+- SQLite
+- Tablas: `usuarios`, `roedores`, `adopciones`
 
 ---
 
 ## ▶️ Cómo ejecutar el proyecto
 
-### 🔹 Frontend (Demo)
+### 🔹 Frontend — Demo
 
-Puedes abrir directamente el archivo `index.html` en tu navegador para ver la demo visual.
+> [!NOTE]
+> Disponible directamente en **GitHub Pages** sin necesidad de instalación ni configuración.
 
 ---
 
-### 🔹 Backend (En desarrollo)
+### 🔹 Backend — Funcional completo
 
-1. Clonar el repositorio:
+> [!WARNING]
+> El backend se encuentra en la rama `Features-backend`. Asegúrate de cambiar de rama antes de instalar dependencias o arrancar el servidor.
+
+1. Cambiar a la rama correcta:
 
 ```bash
-git clone <URL_DEL_REPOSITORIO>
+git checkout Features-backend
 ```
 
 2. Instalar dependencias:
@@ -67,32 +82,49 @@ git clone <URL_DEL_REPOSITORIO>
 npm install
 ```
 
-3. Ejecutar el servidor:
+3. Arrancar el servidor:
 
 ```bash
+cd backend
 npm start
+```
+
+4. Abrir en el navegador:
+
+```
+http://localhost:3000
+```
+
+> [!TIP]
+> La base de datos `database.db` se genera automáticamente al arrancar el servidor por primera vez.
+
+---
+
+## 📁 Estructura del proyecto
+
+```
+├── public/              # Frontend (HTML, CSS, JS)
+│   ├── index.html
+│   └── pages/
+├── backend/
+│   ├── server.js        # Servidor Express y rutas API
+│   └── database.db      # Base de datos SQLite (autogenerada)
 ```
 
 ---
 
 ## 📌 Objetivo del proyecto
 
-Este proyecto forma parte de mi aprendizaje como desarrolladora web, enfocado en:
+Proyecto de aprendizaje full stack enfocado en:
 
-* Construcción de aplicaciones full stack
-* Buenas prácticas de desarrollo
-* Arquitectura modular
-* Integración frontend-backend
-
----
-
-## ✨ Notas
-
-⚠️ El backend aún se encuentra en desarrollo, por lo que algunas funcionalidades pueden no estar completamente disponibles.
+- Arquitectura cliente-servidor real
+- Autenticación segura con JWT y bcrypt
+- Gestión de base de datos relacional con SQLite
+- Comunicación frontend-backend asíncrona
+- Buenas prácticas de desarrollo y control de versiones
 
 ---
 
-## 👩‍💻 Autor
+## 👩‍💻 Autora
 
-SilvityCode
-Desarrolladora Web Junior
+**SilvityCode** — Desarrolladora Web Junior
