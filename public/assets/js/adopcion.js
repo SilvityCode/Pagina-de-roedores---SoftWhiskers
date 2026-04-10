@@ -20,13 +20,11 @@ window.addEventListener('pageshow', (event) => {
 document.addEventListener('DOMContentLoaded', () => {
   const usuario = localStorage.getItem('usuario') || sessionStorage.getItem('usuario');
 
-  // 🔴 NO LOGUEADO → fuera
   if (!usuario) {
     window.location.href = "/pages/login.html";
     return;
   }
 
-  // Si la página fue cargada desde el historial, forzar recarga
   if (performance.getEntriesByType("navigation")[0].type === "back_forward") {
     window.location.reload();
   }
@@ -46,6 +44,14 @@ document.addEventListener('DOMContentLoaded', () => {
     window.location.replace("/pages/login.html");
   });
 
+  // Si hay solicitud pendiente guardada, mostrar mensaje fijo y arrancar polling
+  const pendiente = localStorage.getItem('solicitudPendiente');
+  if (pendiente) {
+    const { mensaje } = JSON.parse(pendiente);
+    mostrarMensajePendiente(mensaje);
+    iniciarPolling();
+  }
+
   comprobarNotificaciones();
 });
 
@@ -56,16 +62,13 @@ window.toggle = async (tipo) => {
   const contenedor = document.getElementById(tipo);
   const estaBaAbierto = !contenedor.classList.contains('oculto');
 
-  // Cerrar todos primero
   document.querySelectorAll('.contenedor').forEach(div => {
     div.classList.add('oculto');
     div.innerHTML = '';
   });
 
-  // Si ya estaba abierto, solo lo cerramos
   if (estaBaAbierto) return;
 
-  // Si estaba cerrado, cargamos y abrimos
   try {
     const url = '/api/roedores/' + tipo;
     const res = await fetch(url);
@@ -81,7 +84,7 @@ window.toggle = async (tipo) => {
           <h3>${r.nombre}</h3>
           <p>📅 Edad: ${r.edad}</p>
           <button class="btn-adoptar" onclick="adoptar(${r.id}, '${r.nombre}')">
-            Adoptar ❤️
+            Adoptar 🤍
           </button>
         </div>
       `).join('');
@@ -116,12 +119,23 @@ window.adoptar = async (id, nombre) => {
     const data = await res.json();
 
     if (res.ok) {
-      mostrarMensaje(data.message, 'exito');
+      // Guardar en localStorage para que persista entre recargas y cierres de sesión
+      localStorage.setItem('solicitudPendiente', JSON.stringify({
+        roedor_id: id,
+        nombre,
+        email,
+        mensaje: data.message
+      }));
 
-      // Recargar la sección para que desaparezca el roedor adoptado
+      mostrarMensajePendiente(data.message);
+
+      // Eliminar la tarjeta del roedor
       const tarjeta = document.querySelector(`[onclick="adoptar(${id}, '${nombre}')"]`)
         ?.closest('.tarjeta-roedor');
       if (tarjeta) tarjeta.remove();
+
+      iniciarPolling();
+
     } else {
       mostrarMensaje(data.error || 'Error al adoptar', 'error');
     }
@@ -132,11 +146,76 @@ window.adoptar = async (id, nombre) => {
 };
 
 // ======================
-// NOTIFICACIONES
+// MENSAJE PENDIENTE — fijo, sin X
+// ======================
+function mostrarMensajePendiente(texto) {
+  const div = document.getElementById('mensaje');
+  div.innerHTML = `<span>${texto}</span>`;
+  div.className = 'mensaje exito';
+  div.classList.remove('oculto');
+}
+
+// ======================
+// POLLING — espera respuesta del admin
+// ======================
+let pollingInterval = null;
+
+function iniciarPolling() {
+  if (pollingInterval) return;
+
+  pollingInterval = setInterval(async () => {
+    const email = localStorage.getItem('email') || sessionStorage.getItem('email');
+    if (!email) return;
+
+    try {
+      const res = await fetch(`/api/mis-notificaciones?email=${email}`);
+      const data = await res.json();
+
+      if (!data.resultado) return;
+
+      const estado = data.resultado.estado;
+
+      if (estado === 'aceptada' || estado === 'rechazada') {
+        clearInterval(pollingInterval);
+        pollingInterval = null;
+
+        // Limpiar solicitud pendiente del localStorage
+        localStorage.removeItem('solicitudPendiente');
+
+        // Ocultar el mensaje de pendiente
+        const msgDiv = document.getElementById('mensaje');
+        msgDiv.classList.add('oculto');
+
+        // Mostrar notificación con X
+        if (estado === 'aceptada') {
+          mostrarNotificacion(
+            `🎉 ¡Tu solicitud para adoptar a ${data.resultado.nombre_roedor} ha sido aceptada! Pronto nos pondremos en contacto contigo.`,
+            'exito',
+            email
+          );
+        } else {
+          mostrarNotificacion(
+            `❌ Tu solicitud para adoptar a ${data.resultado.nombre_roedor} ha sido rechazada.`,
+            'error',
+            email
+          );
+        }
+      }
+    } catch (err) {
+      console.error('Error en polling', err);
+    }
+  }, 5000);
+}
+
+// ======================
+// NOTIFICACIONES — resultado del admin, con X
 // ======================
 async function comprobarNotificaciones() {
   const email = localStorage.getItem('email') || sessionStorage.getItem('email');
   if (!email) return;
+
+  // Si ya hay solicitud pendiente activa, el polling se encarga
+  if (localStorage.getItem('solicitudPendiente')) return;
 
   try {
     const res = await fetch(`/api/mis-notificaciones?email=${email}`);
@@ -144,33 +223,28 @@ async function comprobarNotificaciones() {
 
     if (!data.resultado) return;
 
-    // ID único por roedor y estado para no repetir notificación
-    const notiId = `${data.resultado.roedor_id}_${data.resultado.estado}`;
-    if (sessionStorage.getItem(notiId)) return;
+    const estado = data.resultado.estado;
 
-    // Mostrar notificación según estado
-    if (data.resultado.estado === 'aceptada') {
+    if (estado === 'aceptada') {
       mostrarNotificacion(
         `🎉 ¡Tu solicitud para adoptar a ${data.resultado.nombre_roedor} ha sido aceptada! Pronto nos pondremos en contacto contigo.`,
-        'exito'
+        'exito',
+        email
       );
-    } else if (data.resultado.estado === 'rechazada') {
+    } else if (estado === 'rechazada') {
       mostrarNotificacion(
         `❌ Tu solicitud para adoptar a ${data.resultado.nombre_roedor} ha sido rechazada.`,
-        'error'
+        'error',
+        email
       );
     }
-
-    // Guardamos en sessionStorage para que no vuelva a mostrarse
-    sessionStorage.setItem(notiId, 'true');
 
   } catch (err) {
     console.error('Error al comprobar notificaciones', err);
   }
 }
 
-// Función para mostrar notificación fija con botón de cerrar
-function mostrarNotificacion(texto, tipo) {
+function mostrarNotificacion(texto, tipo, email) {
   const div = document.createElement('div');
   div.className = `notificacion ${tipo}`;
   div.innerHTML = `
@@ -178,28 +252,34 @@ function mostrarNotificacion(texto, tipo) {
     <button class="cerrar">&times;</button>
   `;
 
-  // Insertarla arriba del todo dentro de .card-adopcion
   const card = document.querySelector('.card-adopcion');
   card.insertBefore(div, card.firstChild);
 
-  // Cerrar manualmente al pulsar la X
-  div.querySelector('.cerrar').addEventListener('click', () => {
+  div.querySelector('.cerrar').addEventListener('click', async () => {
     div.remove();
+    if (email) {
+      await fetch('/api/marcar-leida', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+    }
   });
 }
 
-
-
 // ======================
-// MENSAJE FEEDBACK
+// MENSAJE FEEDBACK genérico (errores, con X)
 // ======================
 function mostrarMensaje(texto, tipo) {
   const div = document.getElementById('mensaje');
-  div.textContent = texto;
+  div.innerHTML = `
+    <span>${texto}</span>
+    <button class="cerrar">&times;</button>
+  `;
   div.className = `mensaje ${tipo}`;
   div.classList.remove('oculto');
 
-  setTimeout(() => {
+  div.querySelector('.cerrar').addEventListener('click', () => {
     div.classList.add('oculto');
-  }, 3000);
+  });
 }

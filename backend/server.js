@@ -57,6 +57,9 @@ db.run(`
   )
 `);
 
+// Añadir columna leida si no existe (por si la tabla adopciones ya existe sin ella)
+db.run(`ALTER TABLE adopciones ADD COLUMN leida INTEGER DEFAULT 0`, () => {});
+
 // ======================
 // MIDDLEWARE SOLO ADMIN
 // ======================
@@ -208,23 +211,20 @@ app.get('/admin/solicitudes', (req, res) => {
 app.post('/admin/confirmar', soloAdmin, (req, res) => {
   const { roedor_id } = req.body;
 
-  // Primero obtenemos los datos del roedor
   db.get('SELECT * FROM roedores WHERE id = ?', [roedor_id], (err, roedor) => {
     if (err || !roedor) return res.status(500).json({ error: 'Roedor no encontrado' });
 
     const fecha = new Date().toLocaleDateString('es-ES');
 
-    // Actualizamos el estado del roedor
     db.run(
       'UPDATE roedores SET estado = "adoptado" WHERE id = ?',
       [roedor_id],
       function(err) {
         if (err) return res.status(500).json({ error: 'Error al confirmar' });
 
-        // Insertamos el registro en la tabla adopciones
         db.run(
-          `INSERT INTO adopciones (usuario_email, roedor_id, nombre_roedor, tipo_roedor, fecha, estado)
-           VALUES (?, ?, ?, ?, ?, ?)`,
+          `INSERT INTO adopciones (usuario_email, roedor_id, nombre_roedor, tipo_roedor, fecha, estado, leida)
+           VALUES (?, ?, ?, ?, ?, ?, 0)`,
           [roedor.usuario_email, roedor.id, roedor.nombre, roedor.tipo, fecha, "aceptada"],
           function(err) {
             if (err) return res.status(500).json({ error: 'Error al registrar adopción' });
@@ -249,15 +249,13 @@ app.post('/admin/rechazar', soloAdmin, (req, res) => {
 
     const fecha = new Date().toLocaleDateString('es-ES');
 
-    // Guardamos el rechazo
     db.run(
-      `INSERT INTO adopciones (usuario_email, roedor_id, nombre_roedor, tipo_roedor, fecha, estado)
-       VALUES (?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO adopciones (usuario_email, roedor_id, nombre_roedor, tipo_roedor, fecha, estado, leida)
+       VALUES (?, ?, ?, ?, ?, ?, 0)`,
       [roedor.usuario_email, roedor.id, roedor.nombre, roedor.tipo, fecha, "rechazada"],
       function(err) {
         if (err) return res.status(500).json({ error: 'Error al guardar rechazo' });
 
-        // 🔄 Liberar roedor
         db.run(
           'UPDATE roedores SET estado = "disponible", usuario_email = NULL WHERE id = ?',
           [roedor_id],
@@ -288,7 +286,7 @@ app.get('/api/mis-notificaciones', (req, res) => {
       db.get(
         `SELECT nombre_roedor, tipo_roedor, estado 
          FROM adopciones 
-         WHERE usuario_email = ? 
+         WHERE usuario_email = ? AND leida = 0
          ORDER BY id DESC LIMIT 1`,
         [email],
         (err, adopcion) => {
@@ -303,6 +301,47 @@ app.get('/api/mis-notificaciones', (req, res) => {
     }
   );
 });
+
+// ======================
+// MARCAR NOTIFICACIÓN COMO LEÍDA
+// ======================
+app.post('/api/marcar-leida', (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ error: 'Falta email' });
+
+  db.run(
+    `UPDATE adopciones SET leida = 1 WHERE usuario_email = ? AND leida = 0`,
+    [email],
+    function(err) {
+      if (err) return res.status(500).json({ error: 'Error al marcar como leída' });
+      res.json({ ok: true });
+    }
+  );
+});
+
+// ======================
+// SOLICITUDES (admin panel)
+// ======================
+app.get('/api/solicitudes', (req, res) => {
+  const sql = `
+    SELECT id, usuario_email, nombre AS nombre_roedor, tipo AS tipo_roedor, 'pendiente' AS estado
+    FROM roedores
+    WHERE estado = 'pendiente'
+
+    UNION ALL
+
+    SELECT roedor_id AS id, usuario_email, nombre_roedor, tipo_roedor, estado
+    FROM adopciones
+  `;
+
+  db.all(sql, [], (err, rows) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    res.json(rows);
+  });
+});
+
 
 
 // ======================
