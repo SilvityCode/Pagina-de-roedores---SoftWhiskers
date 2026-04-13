@@ -5,6 +5,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+dotenv.config({ path: '../.env' });
 
 const app = express();
 const PORT = 3000;
@@ -14,7 +16,7 @@ const PORT = 3000;
 // ======================
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const JWT_SECRET = 'softwhiskers_clave_secreta_2024';
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // ======================
 // MIDDLEWARE
