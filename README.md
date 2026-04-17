@@ -31,6 +31,14 @@ Aplicación web full stack para la gestión de adopciones de roedores.
 - Notificación automática al usuario cuando el admin confirma o rechaza (polling cada 5s)
 - Notificación cerrable con X una vez leída
 
+### 🛡️ Panel de administración
+- Vista de solicitudes pendientes, confirmadas y rechazadas
+- Confirmar o rechazar solicitudes de adopción
+- Registro automático de todas las adopciones con fecha y estado
+
+> [!TIP]
+> Para probar la aplicación puedes registrar tu propio usuario desde la página de registro, o contactarme para solicitar credenciales de prueba.
+
 ### 🤖 Asistente virtual
 - Widget de chatbot visual integrado en el frontend
 - Validación de mensajes tanto en el cliente como en el servidor
@@ -40,6 +48,7 @@ Aplicación web full stack para la gestión de adopciones de roedores.
 - Segunda capa de seguridad en backend en `backend/chat.js`, para bloquear mensajes prohibidos antes de llamar a la IA
 - Respuestas estándar de FAQ cuando se detectan palabras clave
 - Uso de la API de Groq solo cuando no hay coincidencia en FAQ
+  
 > [!NOTE]
 > El chatbot está en desarrollo local. Si quieres verlo en acción o probarlo, puedes contactarme.
 ---
@@ -61,14 +70,6 @@ Aplicación web full stack para la gestión de adopciones de roedores.
 <img width="400" alt="chatbot_seguridad" src="https://github.com/user-attachments/assets/ce581285-714d-4dad-8a93-06c0af8b2825" />
 
 *Detección y bloqueo de intento de jailbreak y/o contenido ofensivo*
-
-### 🛡️ Panel de administración
-- Vista de solicitudes pendientes, confirmadas y rechazadas
-- Confirmar o rechazar solicitudes de adopción
-- Registro automático de todas las adopciones con fecha y estado
-
-> [!TIP]
-> Para probar la aplicación puedes registrar tu propio usuario desde la página de registro, o contactarme para solicitar credenciales de prueba.
 
 ---
 
