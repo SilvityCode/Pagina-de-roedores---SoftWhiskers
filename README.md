@@ -159,6 +159,8 @@ Proyecto de aprendizaje full stack enfocado en:
 - Autenticación segura con JWT y bcrypt
 - Gestión de base de datos relacional con SQLite
 - Comunicación frontend-backend asíncrona
+- Integración con APIs externas de inteligencia artificial
+- Desarrollo de un asistente virtual con sistema de FAQs, moderación de contenido y protección ante jailbreak
 - Buenas prácticas de desarrollo y control de versiones
 
 ---
