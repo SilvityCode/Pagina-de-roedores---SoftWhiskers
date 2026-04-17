@@ -47,6 +47,7 @@ Aplicación web full stack para la gestión de adopciones de roedores.
 > Dejo unas capturas de pantalla para que se vea como es el chatbot:
 
 <img width="600" alt="Widget del chatbot" src="https://github.com/user-attachments/assets/7953690b-5f6c-4e82-b7d1-8092a6b7d0d3" />
+
 *Widget visual del chatbot integrado en la página principal*
 
 <img width="400" alt="chatbot_chat" src="https://github.com/user-attachments/assets/52a35f69-7869-40b5-94d9-69581d68375a" />
