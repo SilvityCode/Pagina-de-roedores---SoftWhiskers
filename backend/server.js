@@ -48,19 +48,46 @@ const db = new sqlite3.Database('./database.db', (err) => {
   }
 });
 
-db.run(`
-  CREATE TABLE IF NOT EXISTS usuarios (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    nombre TEXT,
-    email TEXT UNIQUE,
-    password TEXT,
-    comentario TEXT,
-    rol TEXT
-  )
-`);
+db.serialize(() => {
 
-// Añadir columna leida si no existe (por si la tabla adopciones ya existe sin ella)
-db.run(`ALTER TABLE adopciones ADD COLUMN leida INTEGER DEFAULT 0`, () => {});
+  db.run(`
+    CREATE TABLE IF NOT EXISTS usuarios (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      nombre TEXT,
+      email TEXT UNIQUE,
+      password TEXT,
+      comentario TEXT,
+      rol TEXT
+    )
+  `);
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS roedores (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      nombre TEXT,
+      tipo TEXT,
+      edad TEXT,
+      estado TEXT DEFAULT 'disponible',
+      usuario_email TEXT
+    )
+  `);
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS adopciones (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      usuario_email TEXT,
+      roedor_id INTEGER,
+      nombre_roedor TEXT,
+      tipo_roedor TEXT,
+      fecha TEXT,
+      estado TEXT,
+      leida INTEGER DEFAULT 0
+    )
+  `);
+
+  db.run(`ALTER TABLE adopciones ADD COLUMN leida INTEGER DEFAULT 0`, () => {});
+
+});
 
 // ======================
 // MIDDLEWARE SOLO ADMIN
