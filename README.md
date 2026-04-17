@@ -49,13 +49,16 @@ Aplicación web full stack para la gestión de adopciones de roedores.
 <img width="600" alt="Widget del chatbot" src="https://github.com/user-attachments/assets/7953690b-5f6c-4e82-b7d1-8092a6b7d0d3" />
 *Widget visual del chatbot integrado en la página principal*
 
-<img width="561" alt="chatbot_chat" src="https://github.com/user-attachments/assets/52a35f69-7869-40b5-94d9-69581d68375a" />
+<img width="400" alt="chatbot_chat" src="https://github.com/user-attachments/assets/52a35f69-7869-40b5-94d9-69581d68375a" />
+
 *Chat del chatbot*
 
-<img width="520" alt="chatbot_answer" src="https://github.com/user-attachments/assets/a1ee547c-d062-45d5-b8d9-6791b951c18c" />
+<img width="400" alt="chatbot_answer" src="https://github.com/user-attachments/assets/a1ee547c-d062-45d5-b8d9-6791b951c18c" />
+
 *Respuesta automática desde el sistema de FAQs*
 
-<img width="455" alt="chatbot_seguridad" src="https://github.com/user-attachments/assets/ce581285-714d-4dad-8a93-06c0af8b2825" />
+<img width="400" alt="chatbot_seguridad" src="https://github.com/user-attachments/assets/ce581285-714d-4dad-8a93-06c0af8b2825" />
+
 *Detección y bloqueo de intento de jailbreak y/o contenido ofensivo*
 
 ### 🛡️ Panel de administración
