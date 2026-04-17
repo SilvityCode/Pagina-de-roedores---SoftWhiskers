@@ -42,9 +42,9 @@ Aplicación web full stack para la gestión de adopciones de roedores.
 - Uso de la API de Groq solo cuando no hay coincidencia en FAQ
 > [!NOTE]
 > El chatbot está en desarrollo local. Si quieres verlo en acción o probarlo, puedes contactarme.
-👇👇👇
+---
 > [!TIP]
-> Dejo unas capturas de pantalla para que se vea como es el chatbot:
+> 👇Incluyo capturas de pantalla para que se vea como es el chatbot:
 
 <img width="600" alt="Widget del chatbot" src="https://github.com/user-attachments/assets/7953690b-5f6c-4e82-b7d1-8092a6b7d0d3" />
 
