@@ -13,7 +13,7 @@ Aplicación web full stack para la gestión de adopciones de roedores.
 |------|--------|
 | Frontend (demo) | ✅ Disponible en GitHub Pages |
 | Backend + Base de datos | ✅ Funcional — rama `Features-backend` |
-| Chatbot conversacional | 🔧 En desarrollo — rama local privada |
+| Asistente virtual | 🔧 En desarrollo — rama local privada |
 
 ---
 
@@ -31,7 +31,7 @@ Aplicación web full stack para la gestión de adopciones de roedores.
 - Notificación automática al usuario cuando el admin confirma o rechaza (polling cada 5s)
 - Notificación cerrable con X una vez leída
 
-### 🤖 Chatbot conversacional
+### 🤖 Asistente virtual
 - Widget de chatbot visual integrado en el frontend
 - Validación de mensajes tanto en el cliente como en el servidor
 - Sanitización de texto para evitar inyección de código o scripts
