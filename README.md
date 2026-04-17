@@ -13,6 +13,7 @@ Aplicación web full stack para la gestión de adopciones de roedores.
 |------|--------|
 | Frontend (demo) | ✅ Disponible en GitHub Pages |
 | Backend + Base de datos | ✅ Funcional — rama `Features-backend` |
+| Chatbot conversacional | 🔧 En desarrollo — rama local privada |
 
 ---
 
@@ -29,6 +30,33 @@ Aplicación web full stack para la gestión de adopciones de roedores.
 - Mensaje de solicitud pendiente **persistente** entre recargas y cierres de sesión
 - Notificación automática al usuario cuando el admin confirma o rechaza (polling cada 5s)
 - Notificación cerrable con X una vez leída
+
+### 🤖 Chatbot conversacional
+- Widget de chatbot visual integrado en el frontend
+- Validación de mensajes tanto en el cliente como en el servidor
+- Sanitización de texto para evitar inyección de código o scripts
+- Filtrado de contenido ofensivo usando `backend/core/forbidden_words.json`
+- Detección y bloqueo de intentos de jailbreak antes de llamar a la IA
+- Segunda capa de seguridad en backend en `backend/chat.js`, para bloquear mensajes prohibidos antes de llamar a la IA
+- Respuestas estándar de FAQ cuando se detectan palabras clave
+- Uso de la API de Groq solo cuando no hay coincidencia en FAQ
+> [!NOTE]
+> El chatbot está en desarrollo local. Si quieres verlo en acción o probarlo, puedes contactarme.
+👇👇👇
+> [!TIP]
+> Dejo unas capturas de pantalla para que se vea como es el chatbot:
+
+<img width="600" alt="Widget del chatbot" src="https://github.com/user-attachments/assets/7953690b-5f6c-4e82-b7d1-8092a6b7d0d3" />
+*Widget visual del chatbot integrado en la página principal*
+
+<img width="561" alt="chatbot_chat" src="https://github.com/user-attachments/assets/52a35f69-7869-40b5-94d9-69581d68375a" />
+*Chat del chatbot*
+
+<img width="520" alt="chatbot_answer" src="https://github.com/user-attachments/assets/a1ee547c-d062-45d5-b8d9-6791b951c18c" />
+*Respuesta automática desde el sistema de FAQs*
+
+<img width="455" alt="chatbot_seguridad" src="https://github.com/user-attachments/assets/ce581285-714d-4dad-8a93-06c0af8b2825" />
+*Detección y bloqueo de intento de jailbreak y/o contenido ofensivo*
 
 ### 🛡️ Panel de administración
 - Vista de solicitudes pendientes, confirmadas y rechazadas
@@ -108,6 +136,11 @@ http://localhost:3000
 │   └── pages/
 ├── backend/
 │   ├── server.js        # Servidor Express y rutas API
+│   ├── chat.js          # Lógica del chatbot
+│   ├── core/
+│   │   ├── system_prompt.md
+│   │   ├── faqs.json
+│   │   └── forbidden_words.json
 │   └── database.db      # Base de datos SQLite (autogenerada)
 ```
 
