@@ -3,7 +3,7 @@
 Aplicación web full stack para la gestión de adopciones de roedores.
 
 > [!IMPORTANT]
-> Actualmente en desarrollo activo, con una **demo frontend** disponible en GitHub Pages y el **backend completo** en rama separada.
+> Cuenta con una **demo frontend** disponible en GitHub Pages y el **backend completo** en rama separada.
 
 ---
 
